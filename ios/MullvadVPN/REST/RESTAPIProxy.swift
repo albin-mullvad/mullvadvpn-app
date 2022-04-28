@@ -295,7 +295,7 @@ extension REST {
             let requestHandler = AnyRequestHandler { endpoint in
                 let urlEncodedPublicKey = publicKey.base64Key
                     .addingPercentEncoding(withAllowedCharacters: .alphanumerics)!
-                
+
                 let path = "wireguard-keys/".appending(urlEncodedPublicKey)
                 var requestBuilder = self.requestFactory
                     .createURLRequestBuilder(
@@ -304,7 +304,7 @@ extension REST {
                         path: path
                     )
                 requestBuilder.setAuthorization(.accountNumber(accountNumber))
-                
+
                 return .success(requestBuilder.getURLRequest())
             }
 
