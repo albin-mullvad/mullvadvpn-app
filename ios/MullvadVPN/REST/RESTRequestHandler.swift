@@ -21,7 +21,7 @@ extension REST {
         /// There is no requirement for authorizing this request.
         case noRequirement
 
-        /// Authorizatiton request is initiated.
+        /// Authorization request is initiated.
         /// Associated value contains a handle that can be used to cancel
         /// the request.
         case pending(Cancellable)
