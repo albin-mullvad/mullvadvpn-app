@@ -172,10 +172,10 @@ class SimpleMullvadHttpClient(context: Context) {
         (0 until this.length()).asSequence().map { this.get(it) as T }.iterator()
 
     companion object {
-        private const val AUTH_URL =
-            "${BuildConfig.API_BASE_URL}/auth/${BuildConfig.API_VERSION}/token"
+        private const val API_BASE_URL = "https://api.${BuildConfig.BASE_ENDPOINT}"
+        private const val AUTH_URL = "$API_BASE_URL/auth/${BuildConfig.API_VERSION}/token"
         private const val DEVICE_LIST_URL =
-            "${BuildConfig.API_BASE_URL}/accounts/${BuildConfig.API_VERSION}/devices"
+            "$API_BASE_URL/accounts/${BuildConfig.API_VERSION}/devices"
         private const val REQUEST_ERROR_MESSAGE =
             "Unable to verify account due to invalid account or connectivity issues."
     }

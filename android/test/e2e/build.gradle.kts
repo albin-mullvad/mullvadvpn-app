@@ -28,7 +28,7 @@ android {
 
         Properties().apply {
             load(project.file("e2e.properties").inputStream())
-            addRequiredPropertyAsBuildConfigField("API_BASE_URL")
+            addRequiredPropertyAsBuildConfigField("BASE_ENDPOINT")
             addRequiredPropertyAsBuildConfigField("API_VERSION")
         }
 

@@ -236,6 +236,15 @@ jobs:
           build-root-directory: android
           execution-only-caches: true
 
+      - name: Assemble instrumented test apk (e2e)
+        uses: burrunan/gradle-cache-action@v1
+        with:
+          job-id: jdk11
+          arguments: :test:e2e:assemble
+          gradle-version: wrapper
+          build-root-directory: android
+          execution-only-caches: true
+
       - name: Upload apks
         uses: actions/upload-artifact@v3
         with:
@@ -243,18 +252,53 @@ jobs:
           path: |
             android/app/build/outputs/apk
             android/test/mockapi/build/outputs/apk
+            android/test/e2e/build/outputs/apk
           if-no-files-found: error
           retention-days: 1
 
-  instrumented-tests:
-    name: Run instrumented tests
-    runs-on: [self-hosted, android-emulator]
+  # instrumented-tests:
+  #   name: Run instrumented tests
+  #   runs-on: [self-hosted, android-emulator]
+  #   timeout-minutes: 30
+  #   needs: [build]
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       test-type: [app, mockapi]
+  #   steps:
+  #     - name: Checkout repository
+  #       uses: actions/checkout@v3
+
+  #     - uses: actions/download-artifact@v3
+  #       with:
+  #         name: apks
+  #         path: android
+
+  #     - name: Run instrumented test script
+  #       shell: bash -ieo pipefail {0}
+  #       env:
+  #         AUTO_FETCH_TEST_HELPER_APKS: true
+  #       run: |
+  #         ./android/scripts/run-instrumented-tests.sh ${{ matrix.test-type }}
+
+  #     - name: Upload instrumentation report (${{ matrix.test-type }})
+  #       uses: actions/upload-artifact@v3
+  #       if: always()
+  #       with:
+  #         name: ${{ matrix.test-type }}-instrumentation-report
+  #         path: /tmp/mullvad-${{ matrix.test-type }}-instrumentation-report
+  #         if-no-files-found: ignore
+  #         retention-days: 1
+
+  firebase-tests:
+    name: Run firebase tests
+    runs-on: ubuntu-latest
     timeout-minutes: 30
     needs: [build-app]
     strategy:
       fail-fast: false
       matrix:
-        test-type: [app, mockapi]
+        test-type: [e2e, mockapi]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -264,18 +308,15 @@ jobs:
           name: apks
           path: android
 
-      - name: Run instrumented test script
-        shell: bash -ieo pipefail {0}
+      - name: Prepare firebase arg spec
         env:
-          AUTO_FETCH_TEST_HELPER_APKS: true
+          FIREBASE_ARG_SPEC: ${{ secrets.FIREBASE_ARG_SPEC }}
         run: |
-          ./android/scripts/run-instrumented-tests.sh ${{ matrix.test-type }}
+          echo "$FIREBASE_ARG_SPEC" >> firebase.yaml
 
-      - name: Upload instrumentation report (${{ matrix.test-type }})
-        uses: actions/upload-artifact@v3
-        if: always()
+      - name: Run tests on Firebase Test Lab
+        uses: asadmansr/Firebase-Test-Lab-Action@v1.0
         with:
-          name: ${{ matrix.test-type }}-instrumentation-report
-          path: /tmp/mullvad-${{ matrix.test-type }}-instrumentation-report
-          if-no-files-found: ignore
-          retention-days: 1
+          arg-spec: 'firebase.yaml:single'
+        env:
+          SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}

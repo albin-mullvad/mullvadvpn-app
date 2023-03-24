@@ -9,19 +9,22 @@ import androidx.test.uiautomator.Until
 import net.mullvad.mullvadvpn.lib.endpoint.CustomApiEndpointConfiguration
 import net.mullvad.mullvadvpn.lib.endpoint.putApiEndpointConfigurationExtra
 import net.mullvad.mullvadvpn.test.common.constant.APP_LAUNCH_TIMEOUT
-import net.mullvad.mullvadvpn.test.common.constant.CONNECTION_TIMEOUT
+import net.mullvad.mullvadvpn.test.common.constant.IP_INFO_TIMEOUT
 import net.mullvad.mullvadvpn.test.common.constant.LOGIN_PROMPT_TIMEOUT
 import net.mullvad.mullvadvpn.test.common.constant.LOGIN_TIMEOUT
 import net.mullvad.mullvadvpn.test.common.constant.MULLVAD_PACKAGE
 import net.mullvad.mullvadvpn.test.common.constant.SETTINGS_COG_ID
 import net.mullvad.mullvadvpn.test.common.constant.TUNNEL_INFO_ID
 import net.mullvad.mullvadvpn.test.common.constant.TUNNEL_OUT_ADDRESS_ID
-import net.mullvad.mullvadvpn.test.common.extension.clickAgreeOnPrivacyDisclaimer
 import net.mullvad.mullvadvpn.test.common.extension.clickAllowOnNotificationPermissionPromptIfApiLevel33AndAbove
 import net.mullvad.mullvadvpn.test.common.extension.findObjectWithTimeout
 
-class AppInteractor(private val device: UiDevice, private val targetContext: Context) {
-    fun launch(customApiEndpointConfiguration: CustomApiEndpointConfiguration? = null) {
+class AppInteractor(
+    private val device: UiDevice,
+    private val targetContext: Context,
+    private val endpoint: CustomApiEndpointConfiguration?
+) {
+    fun launch(customApiEndpointConfiguration: CustomApiEndpointConfiguration? = endpoint) {
         device.pressHome()
         // Wait for launcher
         device.wait(
@@ -41,9 +44,11 @@ class AppInteractor(private val device: UiDevice, private val targetContext: Con
         device.wait(Until.hasObject(By.pkg(MULLVAD_PACKAGE).depth(0)), APP_LAUNCH_TIMEOUT)
     }
 
-    fun launchAndEnsureLoggedIn(accountToken: String) {
-        launch()
-        device.clickAgreeOnPrivacyDisclaimer()
+    fun launchAndEnsureLoggedIn(
+        accountToken: String,
+        customApiEndpointConfiguration: CustomApiEndpointConfiguration? = endpoint
+    ) {
+        launch(customApiEndpointConfiguration)
         device.clickAllowOnNotificationPermissionPromptIfApiLevel33AndAbove()
         attemptLogin(accountToken)
         ensureLoggedIn()
@@ -64,7 +69,7 @@ class AppInteractor(private val device: UiDevice, private val targetContext: Con
     fun extractIpAddress(): String {
         device.findObjectWithTimeout(By.res(TUNNEL_INFO_ID)).click()
         return device
-            .findObjectWithTimeout(By.res(TUNNEL_OUT_ADDRESS_ID), CONNECTION_TIMEOUT)
+            .findObjectWithTimeout(By.res(TUNNEL_OUT_ADDRESS_ID), IP_INFO_TIMEOUT)
             .text
             .extractIpAddress()
     }

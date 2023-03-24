@@ -44,7 +44,7 @@ abstract class MockApiTest {
         device = UiDevice.getInstance(InstrumentationRegistry.getInstrumentation())
         targetContext = InstrumentationRegistry.getInstrumentation().targetContext
 
-        app = AppInteractor(device, targetContext)
+        app = AppInteractor(device, targetContext, endpoint)
 
         mockWebServer.start()
         Log.d(LOG_TAG, "Mocked web server started using port: ${mockWebServer.port}")
