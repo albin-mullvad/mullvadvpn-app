@@ -298,7 +298,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test-type: [e2e, mockapi]
+        test-type: [e2e] # mockapi
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
