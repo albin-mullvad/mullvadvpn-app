@@ -16,6 +16,7 @@ import net.mullvad.mullvadvpn.test.common.constant.MULLVAD_PACKAGE
 import net.mullvad.mullvadvpn.test.common.constant.SETTINGS_COG_ID
 import net.mullvad.mullvadvpn.test.common.constant.TUNNEL_INFO_ID
 import net.mullvad.mullvadvpn.test.common.constant.TUNNEL_OUT_ADDRESS_ID
+import net.mullvad.mullvadvpn.test.common.extension.clickAgreeOnPrivacyDisclaimer
 import net.mullvad.mullvadvpn.test.common.extension.clickAllowOnNotificationPermissionPromptIfApiLevel33AndAbove
 import net.mullvad.mullvadvpn.test.common.extension.findObjectWithTimeout
 
@@ -49,6 +50,7 @@ class AppInteractor(
         customApiEndpointConfiguration: CustomApiEndpointConfiguration? = endpoint
     ) {
         launch(customApiEndpointConfiguration)
+        device.clickAgreeOnPrivacyDisclaimer()
         device.clickAllowOnNotificationPermissionPromptIfApiLevel33AndAbove()
         attemptLogin(accountToken)
         ensureLoggedIn()
