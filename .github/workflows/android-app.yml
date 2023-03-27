@@ -46,11 +46,13 @@ jobs:
 
     outputs:
       container_image: ${{ env.inner_container_image }}
+      should_skip: yes
 
   generate-relay-list:
     name: Generate relay list
     needs: prepare
     runs-on: ubuntu-latest
+    if: needs.prepare.outputs.should_skip != 'yes'
     container:
       image: ${{ needs.prepare.outputs.container_image }}
     steps:
