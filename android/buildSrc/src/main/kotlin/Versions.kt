@@ -13,6 +13,8 @@ object Versions {
     const val turbine = "1.0.0"
     const val billingClient = "6.0.1"
 
+    const val roborazzi = "1.8.0"
+
     object Android {
         const val compileSdkVersion = 34
         const val junit = "1.4.0"

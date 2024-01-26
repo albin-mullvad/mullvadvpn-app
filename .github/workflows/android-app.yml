@@ -185,6 +185,10 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: ${{ needs.prepare.outputs.container_image }}
+    permissions:
+      contents: write
+      actions: read
+      checks: write
     steps:
       # Fix for HOME path overridden by GH runners when building in containers, see:
       # https://github.com/actions/runner/issues/863
@@ -292,6 +296,24 @@ jobs:
             android/test/e2e/build/outputs/apk
           if-no-files-found: error
           retention-days: 1
+
+      # - name: Run screenshot tests
+      #   uses: burrunan/gradle-cache-action@v1
+      #   with:
+      #     job-id: jdk17
+      #     arguments: :test:arch:test --rerun-tasks
+      #     gradle-version: wrapper
+      #     build-root-directory: android
+      #     execution-only-caches: true
+
+      - name: Post screenshots on failure
+        #if: ${{ failure() }}
+        uses: edunad/actions-image@v2.0.3
+        with:
+            path: './gui/assets/images/*.png'
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            title: 'Failed E2E tests 🙀'
+            annotationLevel: 'failure'
 
   instrumented-tests:
     name: Run instrumented tests
